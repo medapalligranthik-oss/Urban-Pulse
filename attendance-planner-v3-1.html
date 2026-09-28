@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Attendance Planner</title>
+<style>
+:root{--bg:#f4f5fb;--card:#fff;--tx:#1c2033;--mut:#7a8194;--bd:#e7e9f2;--ok:#16a34a;--okbg:#e7f8ee;--warn:#d97706;--warnbg:#fff4de;--bad:#dc2626;--badbg:#fdeaea;--ac:#6366f1;--ac2:#8b5cf6;--sh:0 4px 20px rgba(60,70,120,.08);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1018;--card:#171a25;--tx:#eceef6;--mut:#98a0b5;--bd:#262b3b;--ok:#4ade80;--okbg:#12301f;--warn:#fbbf24;--warnbg:#3a2a0a;--bad:#f87171;--badbg:#3b1416;--ac:#818cf8;--ac2:#a78bfa;--sh:none}}
+:root[data-theme="dark"]{--bg:#0e1018;--card:#171a25;--tx:#eceef6;--mut:#98a0b5;--bd:#262b3b;--ok:#4ade80;--okbg:#12301f;--warn:#fbbf24;--warnbg:#3a2a0a;--bad:#f87171;--badbg:#3b1416;--ac:#818cf8;--ac2:#a78bfa;--sh:none}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;padding:28px 20px 64px}
+.wrap{max-width:900px;margin:0 auto}
+header h1{margin:0;font-size:1.7rem;letter-spacing:-.02em}header p{margin:6px 0 0;opacity:.9}
+.chip{display:inline-block;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:99px;font-size:.78rem;margin-top:12px}
+main{max-width:900px;margin:-44px auto 40px;padding:0 16px}
+.step{background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:20px;margin-bottom:16px;border:1px solid var(--bd)}
+.step h2{font-size:1rem;margin:0 0 14px;display:flex;align-items:center;gap:10px}
+.n{width:26px;height:26px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-size:.8rem}
+label{display:block;font-size:.8rem;color:var(--mut);margin-bottom:5px}
+input,select,textarea{font:inherit;width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:560px){.two{grid-template-columns:1fr}}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.quick button{border:1px solid var(--bd);background:var(--bg);color:var(--tx);padding:7px 13px;border-radius:99px;font:inherit;font-size:.82rem;cursor:pointer}
+.quick button:hover{border-color:var(--ac);color:var(--ac)}
+.subj{display:grid;grid-template-columns:1fr 84px;gap:6px 14px;align-items:center;padding:12px 0;border-top:1px solid var(--bd)}
+.subj:first-of-type{border-top:0}.subj b{font-weight:600;font-size:.93rem}.subj input[type=range]{grid-column:1/-1;padding:0;height:22px;accent-color:var(--ac);background:none;border:0}
+details.adv{margin-top:14px}summary{cursor:pointer;color:var(--mut);font-size:.85rem}
+.chk{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:.85rem;color:var(--mut)}.chk input{width:auto}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat{border-radius:16px;padding:14px;text-align:center}.stat b{display:block;font-size:1.7rem;line-height:1.1}.stat span{font-size:.76rem}
+.alert{margin-bottom:16px;padding:18px;border-radius:18px;background:var(--bad);color:#fff;font-weight:700;animation:p 1.3s infinite}
+.alert small{display:block;font-weight:500;margin-top:5px;opacity:.95}
+@keyframes p{50%{box-shadow:0 0 0 7px rgba(220,38,38,.3)}}
+.card{background:var(--card);border:1px solid var(--bd);border-left:5px solid var(--ok);border-radius:18px;padding:16px 18px;margin-bottom:12px;box-shadow:var(--sh)}
+.card.warn{border-left-color:var(--warn)}.card.bad{border-left-color:var(--bad)}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.top h3{margin:0;font-size:.98rem}
+.pill{font-size:.7rem;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap}
+.ok{background:var(--okbg);color:var(--ok)}.warn.pill{background:var(--warnbg);color:var(--warn)}.bad.pill{background:var(--badbg);color:var(--bad)}
+.big{margin:10px 0 2px;font-size:1.05rem}.big b{font-size:1.7rem;letter-spacing:-.02em}.mut{color:var(--mut);font-size:.85rem}
+.track{position:relative;height:8px;background:var(--bd);border-radius:9px;margin:14px 0 6px}.track i{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:var(--ok)}
+.warn .track i{background:var(--warn)}.bad .track i{background:var(--bad)}.track u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--tx);opacity:.35}
+.scale{position:relative;height:14px;font-size:.66rem;color:var(--mut)}.scale span{position:absolute;transform:translateX(-50%)}
+.card details{margin-top:8px}table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:8px}td{padding:6px 0;border-top:1px solid var(--bd)}td:last-child{text-align:right;font-weight:600}
+.note{color:var(--mut);font-size:.78rem;line-height:1.5;margin-top:18px}
+</style></head><body>
+<header><div class="wrap"><h1>📅 Attendance Planner</h1><p>Know exactly how many classes you need to attend — before it's too late.</p><span class="chip">Semester · 29 Aug – 29 Nov 2026</span></div></header>
+<main>
+<section class="step"><h2><span class="n">1</span>Choose your section</h2><select id="sec"></select></section>
+<section class="step"><h2><span class="n">2</span>Pick your dates</h2>
+<div class="two"><div><label>Today</label><input type="date" id="today"></div><div><label>Plan up to (future date)</label><input type="date" id="plan"></div></div>
+<div class="quick"><button data-add="7">+1 week</button><button data-add="14">+2 weeks</button><button data-add="30">+1 month</button><button data-add="999">End of semester</button></div>
+<details class="adv"><summary>Advanced: holidays &amp; today's classes</summary>
+<label class="chk"><input type="checkbox" id="inc" checked> Today's classes are still to be attended</label>
+<label style="margin-top:12px">Holidays (YYYY-MM-DD, comma separated)</label><textarea id="hol" rows="2"></textarea></details></section>
+<section class="step"><h2><span class="n">3</span>Enter your current attendance</h2><div id="inputs"></div></section>
+<div id="stats" class="stats"></div><div id="alert"></div><div id="cards"></div>
+<p class="note">How it works: classes held = timetable periods from 29 Aug to the cut-off (Mon–Fri, minus holidays); attended ≈ your % × held. Needed = ⌈threshold × (held + remaining)⌉ − attended. If that exceeds the classes left, it is irreversible. Labs, workshops and CDC hours are separate rows. First-year timetables are marked 2024-25 in the source PDF; the same semester dates are assumed. Multi-period blocks (German, Japanese, workshops) count one per period shown.</p>
+</main>
+<script>
+/* Timetables. Tokens per day = periods in order ('-' = free). 'X/Y' = X for first branch, Y for second. */
+const b3={A:"Discrete Mathematics",B:"Microprocessor & Microcontroller (MPMC)",C:"VLSI Design & Technology",D:"System & Network on Chip",E:"Machine Learning for All",F:"Community Connect",G:"Analytical & Logical Thinking (CDC)",H:"Indian Art Form",L:"VLSI/Microprocessor Lab",BP:"MPMC – Project hour"};
+const iv={A:"Behavioural Psychology",B:"Wireless Comm & Antenna Systems",C:"Computer Comm & Network Security",D:"Semiconductor Memory Design",E:"Scripting Language for EDA",F:"Machine Learning for All",L:"CCNS Lab"};
+const ds2={A:"Transforms & Boundary Value Problems",B:"Solid State Devices",C:"Computer Organization & Architecture",D:"Digital Logic Design",E:"Electromagnetic Theory & Interference",F:"Professional Ethics",G:"Universal Human Values-II",H:"Verbal Reasoning (CDC)",I:"Social Engineering",L:"Devices & Digital IC Lab"};
+const fy={E:"Philosophy of Engineering",A:"Advanced Calculus & Complex Analysis",B:"Chemistry",D:"Programming for Problem Solving",CL:"Chemistry Lab",W:"Basic Civil & Mechanical Workshop",PL:"PPS Lab",PC:"PCB / EC Lab",N:"NSS",GE:"German",CD:"General Aptitude (CDC)",Y:"Yoga",J:"Japanese"};
+const br=(d,i)=>d.map(r=>r.split(" ").map(t=>t.includes("/")?(t.split("/")[i]||"-"):t).join(" "));
+const eceB=["CD F/G CL CL - E E B A","W W W W - C B A D","F/G PL CD CD PL - B E D","N N C A - D GE GE GE","PC PC - GE GE - - B A"];
+const bio=["C/- Y Y F/G - E E A B","CD CD C/- F/- - - B A D","W W W W - D B E D","CL CL A C/G - B J J J","F/- CD A J J - - PL PL"];
+const SEC={
+"I ECE-A":{g:"I Year",s:{...fy,C:"Electronic System & PCB Design",F:"Biology"},d:["E E B A - CL CL F CD","C B A D - W W W W","B E D - - PL PL PC PC","GE GE GE A - CD CD N N","D A C B - F GE GE GE"]},
+"I ECE-B":{g:"I Year",s:{...fy,F:"Electronic System & PCB Design",C:"Biology"},d:br(eceB,0)},
+"I EEE":{g:"I Year",s:{...fy,G:"Electrical Circuits",C:"Biology"},d:br(eceB,1)},
+"I ECE-DS":{g:"I Year",s:{...fy,C:"Electronic System & PCB Design",F:"Biology"},d:["F CD PC PC - E E B A","CL CL N N - C B A D","CD CD A - PL PL B E D","F A D GE GE - - C B","GE GE GE PL - W W W W"]},
+"I Biotech-B":{g:"I Year",s:{...fy,C:"Cell Biology",F:"Biochemistry"},d:br(bio,0)},
+"I Biomedical Engg":{g:"I Year",s:{...fy,G:"Human Physiology & Anatomy"},d:br(bio,1)},
+"II ECE-DS A":{g:"II Year",s:ds2,d:["E A I I G G L L","C A E D G - H H","A B C D - H - -","B C A F L L - -","D B E C - - - -"]},
+"II ECE-DS B":{g:"II Year",s:ds2,d:["- - L L D B C I","L L - - C D E A","G - - - I E A D","G G H H A C B E","H - - - F A B C"]},
+"II BME":{g:"II Year",s:{A:"Transforms & Boundary Value Problems",B:"Biomedical Signals & Systems",C:"Electric & Electronic Circuits",D:"Digital Logic for Medical Systems",E:"Medical Physics",F:"Professional Ethics",G:"Universal Human Values-II",H:"Verbal Reasoning (CDC)",I:"Social Engineering",L:"DLMS/EEC Lab"},d:["E C I I L L - -","C E B A H H - -","B D A - H G - -","A E B D - - L L","F A C D - - G G"]},
+"III ECE-A":{g:"III Year",s:b3,d:["E B B A G G - -","H D B BP - G - -","C A D F - - L L","A E C F - - - -","D A E C L L - -"]},
+"III ECE-B":{g:"III Year",s:b3,d:["L L - - E B A D","G G - - F B D C","G - - - BP B A H","L L - - A C E F","- - - - C A E D"]},
+"III ECE-DS":{g:"III Year",s:{...b3,D:"Machine Learning for All",E:"Database Design & Management"},d:["E B C A - - - -","C B D F L L - -","H B A C - - G G","A D E F - - - -","D A E BP G - L L"]},
+"III BME":{g:"III Year",s:{A:"Probability & Statistics",B:"Microcontrollers & Applications in Medicine",C:"Biomedical Signal Processing",D:"Biometrics",E:"Modern Wireless Communication",F:"Principles of Medical Imaging",G:"Analytical & Logical Thinking (CDC)",H:"Indian Art Form",I:"Community Connect",M:"MPMC Lab",Q:"Bio DSP Lab"},d:["G G M M E B F H","Q Q G - C D A B","- - - - C A F D","- - - I A C E B","I - - - F A D E"]},
+"IV ECE-A":{g:"IV Year",s:iv,d:["C - A D - - - -","C D B F - - - -","B L E F - - - -","F A E B - - - -","C A D E - - - -"]},
+"IV ECE-B":{g:"IV Year",s:iv,d:["C A E F - - - -","C E F B - - - -","C D A B - - - -","D B L A - - - -","E D F - - - - -"]}
+};
+const START=new Date(2026,7,29),END=new Date(2026,10,29),$=id=>document.getElementById(id);
+const key=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const clamp=d=>d<START?START:d>END?END:d;
+let sec,keys=[];
+const hols=()=>new Set($("hol").value.split(/[\s,]+/).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)));
+function count(from,to){const r={},H=hols();
+ for(let d=new Date(from);d<=to;d=addD(d,1)){const w=d.getDay();if(w<1||w>5||H.has(key(d)))continue;
+  (SEC[sec].d[w-1]||"").split(" ").forEach(t=>{if(t!=="-")r[t]=(r[t]||0)+1});}
+ return r;}
+function build(){
+ sec=$("sec").value;const S=SEC[sec];
+ keys=[...new Set(S.d.join(" ").split(" ").filter(t=>t!=="-"))].filter(k=>S.s[k]).sort();
+ $("inputs").innerHTML=keys.map(k=>`<div class="subj"><b>${S.s[k]}</b><input type="number" min="0" max="100" step="0.1" value="80" data-n="${k}"><input type="range" min="0" max="100" step="0.5" value="80" data-r="${k}"></div>`).join("");
+ document.querySelectorAll("[data-n]").forEach(n=>n.oninput=()=>{document.querySelector(`[data-r="${n.dataset.n}"]`).value=n.value;render()});
+ document.querySelectorAll("[data-r]").forEach(r=>r.oninput=()=>{document.querySelector(`[data-n="${r.dataset.r}"]`).value=r.value;render()});
+ render();}
+function render(){
+ sec=$("sec").value;const S=SEC[sec];
+ const today=parse($("today").value);let plan=parse($("plan").value);if(plan<today)plan=today;
+ const first=$("inc").checked?today:addD(today,1);
+ const held=first>START?count(START,addD(first,-1)):{},rem=first>END?{}:count(clamp(first),END),win=first>END||plan<first?{}:count(clamp(first),plan>END?END:plan);
+ const irrev=[];let list=[],ok=0,dz=0;
+ keys.forEach(k=>{
+  const pct=Math.min(100,Math.max(0,parseFloat(document.querySelector(`[data-n="${k}"]`).value)||0));
+  const h=held[k]||0,r=rem[k]||0,w=win[k]||0,tot=h+r,a=Math.round(pct*h/100);if(!tot)return;
+  const need=t=>Math.max(0,Math.ceil(t*tot-1e-9)-a),n75=need(.75),n90=need(.9),irr=n75>r;
+  const maxEnd=(a+r)/tot*100,cls=irr?"bad":pct<75?"warn":"ok";
+  if(irr)irrev.push(S.s[k]);else if(pct<75)dz++;else ok++;
+  const nPlan=Math.max(0,Math.ceil(.75*(h+w)-1e-9)-a),f=x=>isFinite(x)?x.toFixed(1)+"%":"—";
+  const head=irr?`<div class="big"><b>Can't recover</b></div><div class="mut">Even attending all ${r} remaining classes ends at ${maxEnd.toFixed(1)}%.</div>`
+   :n75>0?`<div class="big">Attend <b>${n75}</b> of ${r} classes</div><div class="mut">to stay at or above 75%${n90<=r?` · for 90%: ${n90} of ${r}`:` · 90% is out of reach (max ${maxEnd.toFixed(1)}%)`}</div>`
+   :`<div class="big">You can skip <b>${r-n75}</b> of ${r} classes</div><div class="mut">and still stay ≥75%${n90<=r?` · for 90%: attend ${n90} of ${r}`:` · 90% is out of reach`}</div>`;
+  list.push({o:irr?0:pct<75?1:pct<90?2:3,h:`<div class="card ${cls}"><div class="top"><h3>${S.s[k]}</h3><span class="pill ${cls}">${irr?"Irreversible":pct<75?"Detention zone":pct<90?"Safe":"Above 90%"}</span></div>${head}
+   <div class="track"><i style="width:${pct}%"></i><u style="left:75%"></u><u style="left:90%"></u></div><div class="scale"><span style="left:${pct}%;color:var(--tx);font-weight:600">${pct}%</span><span style="left:75%;top:14px">75</span><span style="left:90%;top:14px">90</span></div>
+   <details style="margin-top:14px"><summary>More details</summary><table>
+   <tr><td>Held so far · attended (est.)</td><td>${h} · ${a}</td></tr><tr><td>Total left in semester</td><td>${r}</td></tr>
+   <tr><td>Classes until ${$("plan").value}</td><td>${w}</td></tr><tr><td>Attend all → % on that date</td><td>${f((a+w)/(h+w)*100)}</td></tr>
+   <tr><td>Miss all → % on that date</td><td>${f(a/(h+w)*100)}</td></tr><tr><td>To be ≥75% by that date</td><td>${nPlan>w?"Not reachable yet":nPlan+" of "+w}</td></tr></table></details></div>`});});
+ list.sort((x,y)=>x.o-y.o);$("cards").innerHTML=list.map(x=>x.h).join("");
+ $("stats").innerHTML=`<div class="stat ok"><b>${ok}</b><span>On track</span></div><div class="stat" style="background:var(--warnbg);color:var(--warn)"><b>${dz}</b><span>Detention zone</span></div><div class="stat" style="background:var(--badbg);color:var(--bad)"><b>${irrev.length}</b><span>Irreversible</span></div>`;
+ $("alert").innerHTML=irrev.length?`<div class="alert">🚨 IRREVERSIBLE DETENTION<br>${irrev.join(" · ")}<small>Even with 100% attendance from now on, you cannot reach 75% before 29 Nov 2026. Speak to your faculty / HOD right away.</small></div>`:"";
+}
+let lastG="";
+$("sec").innerHTML=Object.entries(SEC).map(([n,v])=>{const o=(v.g!==lastG?(lastG?"</optgroup>":"")+`<optgroup label="${v.g}">`:"")+`<option>${n}</option>`;lastG=v.g;return o}).join("")+"</optgroup>";
+$("hol").value="2026-10-02, 2026-10-19, 2026-10-20";
+const t0=clamp(new Date());$("today").value=key(t0);$("plan").value=key(clamp(addD(t0,14)));
+["today","plan"].forEach(id=>{$(id).min=key(START);$(id).max=key(END)});
+document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{$("plan").value=key(clamp(addD(parse($("today").value),+b.dataset.add)));render()});
+$("sec").onchange=build;["today","plan","inc","hol"].forEach(id=>$(id).onchange=render);$("hol").oninput=render;
+build();
+</script></body></html>
